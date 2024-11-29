@@ -1,8 +1,8 @@
-package com.sorivma.apiservice.api.rest.v1.hateoas.model
+package org.example.antifraudapi.rest.models
 
 import org.springframework.hateoas.RepresentationModel
 
-data class UserRepresentation(
+open class UserRepresentation(
     val id: String? = null,
     val name: String
 ): RepresentationModel<UserRepresentation>()

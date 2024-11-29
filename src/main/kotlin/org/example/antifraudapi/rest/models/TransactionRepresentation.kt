@@ -1,10 +1,11 @@
-package com.sorivma.apiservice.api.rest.v1.hateoas.model
+package org.example.antifraudapi.rest.models
 
-import com.sorivma.apiservice.core.model.TransactionStatus
+import jakarta.validation.constraints.Positive
 import org.springframework.hateoas.RepresentationModel
 
-data class TransactionRepresentation(
+open class TransactionRepresentation(
     val id: String? = null,
+    @Positive
     val amount: Double,
     val status: TransactionStatus,
 ): RepresentationModel<TransactionRepresentation>()

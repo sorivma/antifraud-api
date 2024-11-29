@@ -1,4 +1,4 @@
-package com.sorivma.apiservice.core.model
+package org.example.antifraudapi.rest.models
 
 enum class AccountStatus {
     ACTIVE, SUSPENDED, CLOSED

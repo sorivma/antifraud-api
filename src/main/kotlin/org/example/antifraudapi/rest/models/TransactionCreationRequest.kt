@@ -1,4 +1,7 @@
 package org.example.antifraudapi.rest.models
 
-class TransactionCreationRequest {
-}
+open class TransactionCreationRequest(
+    val id: String? = null,
+    val amount: Double,
+    val status: TransactionStatus,
+)
