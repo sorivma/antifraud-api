@@ -1,13 +1,11 @@
 package org.example.antifraudapi.rest.controllers
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
-import org.example.antifraudapi.rest.models.AccountRepresentation
-import org.example.antifraudapi.rest.models.AccountStatus
 import org.example.antifraudapi.rest.models.TransactionCreationRequest
 import org.example.antifraudapi.rest.models.TransactionRepresentation
 import org.springframework.data.domain.Pageable
@@ -15,69 +13,57 @@ import org.springframework.hateoas.PagedModel
 import java.util.*
 
 interface TransactionController {
+
     @Operation(
-        summary = "Get user account by user id",
+        summary = "Get transactions of a user by user ID",
+        description = "Fetches a paginated list of transactions for the specified user ID.",
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "Paged model of transactions",
-                content = [Content(schema = Schema(implementation = AccountRepresentation::class))]
-            )
-        ],
-        parameters = [
-            Parameter(
-                description = "Pageable config of transactions",
-                schema = Schema(
-                    implementation = Pageable::class
-                )
+                description = "Successfully retrieved a paginated list of transactions",
+                content = [Content(schema = Schema(implementation = PagedModel::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found"
             )
         ]
     )
-    fun getTransactions(pageable: Pageable): PagedModel<TransactionRepresentation>
+    fun getTransactions(
+        pageable: Pageable
+    ): PagedModel<TransactionRepresentation>
 
     @Operation(
-        summary = "Get transaction by its id",
+        summary = "Get a specific transaction by its ID",
+        description = "Retrieves a transaction using its unique ID.",
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "Model of transactions",
+                description = "Successfully retrieved the transaction details",
                 content = [Content(schema = Schema(implementation = TransactionRepresentation::class))]
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "Transaction not found",
-            )
-        ],
-        parameters = [
-            Parameter(
-                required = true,
-                description = "ID of transaction",
+                description = "Transaction not found"
             )
         ]
     )
-    fun getTransaction(transactionId: UUID): TransactionRepresentation
+    fun getTransaction(
+        transactionId: UUID
+    ): TransactionRepresentation
 
     @Operation(
-        summary = "Get page model of transactions addressed to user with specified id",
+        summary = "Get incoming transactions for a user by user ID",
+        description = "Fetches a paginated list of transactions addressed to a specific user.",
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "Model of transactions",
-                content = [Content(schema = Schema(implementation = Pageable::class))]
+                description = "Successfully retrieved a paginated list of incoming transactions",
+                content = [Content(schema = Schema(implementation = PagedModel::class))]
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "User not found",
-            )
-        ],
-        parameters = [
-            Parameter(
-                required = true,
-                description = "ID of User",
-            ),
-            Parameter(
-                description = "Pageable config of transactions",
-                schema = Schema(implementation = Pageable::class)
+                description = "User not found"
             )
         ]
     )
@@ -87,27 +73,17 @@ interface TransactionController {
     ): PagedModel<TransactionRepresentation>
 
     @Operation(
-        summary = "Get page model of transactions addressed from user with specified id",
+        summary = "Get outgoing transactions for a user by user ID",
+        description = "Fetches a paginated list of transactions originating from a specific user.",
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "Model of transactions",
-                content = [Content(schema = Schema(implementation = Pageable::class))]
+                description = "Successfully retrieved a paginated list of outgoing transactions",
+                content = [Content(schema = Schema(implementation = PagedModel::class))]
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "User not found",
-            )
-        ],
-        parameters = [
-            Parameter(
-                required = true,
-                description = "ID of User",
-            ),
-            Parameter(
-                required = true,
-                description = "Pageable config of transactions",
-                schema = Schema(implementation = Pageable::class)
+                description = "User not found"
             )
         ]
     )
@@ -117,24 +93,26 @@ interface TransactionController {
     ): PagedModel<TransactionRepresentation>
 
     @Operation(
-        summary = "Create transaction",
+        summary = "Create a new transaction",
+        description = "Initiates a new transaction between users. Both the payee and payer must exist.",
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "Transaction created",
+                description = "Transaction successfully created",
                 content = [Content(schema = Schema(implementation = TransactionRepresentation::class))]
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "User (payee or payer) not found",
+                description = "Payee or Payer not found"
             )
         ],
-        parameters = [
-            Parameter(
-                required = true,
-                description = "Transaction info",
-            )
-        ]
+        requestBody = RequestBody(
+            description = "Transaction details to be created",
+            required = true,
+            content = [Content(schema = Schema(implementation = TransactionCreationRequest::class))]
+        )
     )
-    fun createTransaction(@Valid transaction: TransactionCreationRequest): TransactionRepresentation
+    fun createTransaction(
+        @Valid transaction: TransactionCreationRequest
+    ): TransactionRepresentation
 }

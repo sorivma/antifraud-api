@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.example"
-version = "0.0.1-SNAPSHOT"
+version = "0.1.3-SNAPSHOT"
 
 java {
     toolchain {
@@ -15,17 +15,31 @@ java {
     }
 }
 
+ext {
+    set("springBootVersion", "3.4.0")
+    set("springDocVersion", "2.0.2")
+    set("junitVersion", "5.8.2")
+    set("kotlinVersion", "1.9.25")
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springDocVersion")}")
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -43,19 +57,21 @@ tasks.withType<Test> {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        create<MavenPublication>("mavenJava") {
             from(components["java"])
-
-            pom {
-                name.set("Contract Module")
-                description.set("A contract module to specify api in anti-fraud system")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://www.opensource.org/licenses/MIT")
-                    }
-                }
+            groupId = "com.sorivma"
+            artifactId = "antifraud-api"
+            version = project.version.toString()
+        }
+    }
+    repositories {
+        maven {
+            name = "nexus"
+            url = uri("http://91.210.170.21:8085/repository/maven-snapshots")
+            isAllowInsecureProtocol = true
+            credentials {
+                username = System.getenv("NEXUS_USERNAME")
+                password = System.getenv("NEXUS_PASSWORD")
             }
         }
     }
